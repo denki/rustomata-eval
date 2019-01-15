@@ -69,7 +69,10 @@ function _gf_ {
         echo "done."
     done
 
-    $DISCO eval "$TMP/$corpus/splits/test-1-9.export" "$TMP/$corpus/results/gf-predictions.export" "$DISCODOP_EVAL" \
+    # revert the changes done to the terminal symbols “.”, “(”, and “,” by rparse
+    sed 's/^\([\.(,]\)\([[:space:]]\)/$\1\2/g' "$TMP/$corpus/results/gf-predictions.export" > "$TMP/$corpus/results/gf-predictions-reverted.export"
+
+    $DISCO eval "$TMP/$corpus/splits/test-1-9.export" "$TMP/$corpus/results/gf-predictions-reverted.export" "$DISCODOP_EVAL" \
          > "$RESULTS/gf-$corpus-scores.txt" \
         || fail_and_cleanup
 
