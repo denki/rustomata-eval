@@ -55,7 +55,14 @@ function _rparse_ {
 function _gf_ {
     corpus=`basename $1`
     assert_folder_structure "$corpus"
-    assert_corpus_files "$1" "$corpus"
+
+    # replace words by POS-Tags
+    if ! [ -f "$TMP/$corpus/corpus-POS.export" ]; then
+        sed 's/^#BOS[[:space:]]*\([^[:space:]]*\).*/#BOS \1 -1 0 -1/g' "$1" | "$VANDA" negra transform --replace-words-by-pos-tag > "$TMP/$corpus/corpus-POS.export" 2> /dev/null \
+            || fail_and_cleanup "$TMP/$corpus/corpus-POS.export"
+    fi
+
+    assert_corpus_files "$TMP/$corpus/corpus-POS.export" "$corpus"
     assert_tfcv_gf_files "$corpus"
 
     echo -e "len\ttime\tsuccess" >> "$TMP/$corpus/results/gf-times.tsv"
